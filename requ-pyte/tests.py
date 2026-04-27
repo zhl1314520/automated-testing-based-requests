@@ -1,6 +1,6 @@
 import pytest
 import requests
-from config import LOGIN_URL, USER_INFO, USER_MANAGE
+from config import LOGIN_URL, USER_INFO, USER_MANAGE, SEND_CODE, VERIFY_CODE, RESET_PASSWORD
 
 @pytest.mark.parametrize("email,password,expected_status", [
     ("17201665342@163.com", "123456", 200),
@@ -119,4 +119,47 @@ def test_change_password(id, old_password, new_password, token, expected_status)
     assert result.status_code == expected_status
 
 
+@pytest.mark.parametrize("email, expected_status", [
+    ("16337216311@163.com", 200)
+])
+def test_forget_password(email, expected_status):   # 这里不能频繁的运行，因为这里有频率限制
+    payload = {
+        "email": email
+    }
+    result = requests.post(SEND_CODE, params=payload)   # 这里不用 json；因为后端接口中的 email：str，是普通的参数，不是 Pydantic 类型
+    print(result.status_code)
+    print(result.json())
 
+    assert result.status_code == expected_status
+
+
+# @pytest.mark.parametrize("email, code, expected_status", [
+#     ("16337216311@163.com", "以实际的 code 为准", 200)
+# ])
+# def test_verify_code(email, code, expected_status):
+#     payload = {
+#         "email": email,
+#         "code": code
+#     }
+#     result = requests.post(VERIFY_CODE, params=payload)
+#     print(result.status_code)
+#     print(result.json())
+#
+#     assert result.status_code == expected_status
+
+
+
+# @pytest.mark.parametrize("email, code, new_password, expected_status", [
+#     ("16337216311@163.com", "以实际的 code 为准", "12344321", 200)
+# ])
+# def test_reset_password(email, code, new_password, expected_status):
+#     payload = {
+#         "email": email,
+#         "code": code,
+#         "new_password": new_password
+#     }
+#     result = requests.post(RESET_PASSWORD, params=payload)
+#     print(result.status_code)
+#     print(result.json())
+#
+#     assert result.status_code == expected_status
