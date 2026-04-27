@@ -1,6 +1,8 @@
 import pytest
 import requests
-from config import LOGIN_URL, USER_INFO, USER_MANAGE, SEND_CODE, VERIFY_CODE, RESET_PASSWORD
+from Tools.scripts.generate_opcode_h import header
+
+from config import LOGIN_URL, USER_INFO, USER_MANAGE, SEND_CODE, VERIFY_CODE, RESET_PASSWORD, PROJECTS_MANAGE
 
 @pytest.mark.parametrize("email,password,expected_status", [
     ("17201665342@163.com", "123456", 200),
@@ -163,3 +165,30 @@ def test_forget_password(email, expected_status):   # 这里不能频繁的运�
 #     print(result.json())
 #
 #     assert result.status_code == expected_status
+
+
+@pytest.mark.parametrize("name, description, expected_status", [
+    ("test_April_twenty_seven", "4.27 接口自动化测试用例", 200)
+])
+def test_create_project(name, description, token, expected_status):
+    payload = {
+        "name": name,
+        "description": description
+    }
+    result = requests.post(PROJECTS_MANAGE, json=payload, headers={"Authorization": f"Bearer {token}"})
+    print(result.status_code)
+    print(result.json())
+
+    assert result.status_code == expected_status
+
+
+
+@pytest.mark.parametrize("page, page_size, expected_status", [
+    (1, 10, 200)
+])
+def test_get_project_list(page, page_size, token, expected_status):
+    result = requests.get(PROJECTS_MANAGE, params={"page": page, "page_size": page_size}, headers={"Authorization": f"Bearer {token}"})
+    print(result.status_code)
+    print(result.json())
+
+    assert result.status_code == expected_status
